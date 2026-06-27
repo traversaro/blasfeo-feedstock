@@ -2,7 +2,7 @@ rmdir /s /q build
 mkdir build
 cd build
 
-cmake ^
+cmake %CMAKE_ARGS^ ^
     -G "Ninja" ^
     -DCMAKE_C_COMPILER=clang-cl ^
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
