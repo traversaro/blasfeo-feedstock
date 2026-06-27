@@ -5,7 +5,6 @@ cd build
 cmake ^
     -G "Ninja" ^
     -DCMAKE_C_COMPILER=clang-cl ^
-    -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DBUILD_TESTING:BOOL=ON ^
