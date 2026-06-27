@@ -86,8 +86,8 @@ tests:
     requirements:
       run:
         - cmake-package-check
-        - ${{ compiler("c") }}
-        - cmake
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
 
   - script:
       - if: linux
