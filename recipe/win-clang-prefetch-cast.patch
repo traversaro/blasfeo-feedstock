@@ -1,0 +1,118 @@
+diff --git a/blasfeo_hp_cm/dgemm.c b/blasfeo_hp_cm/dgemm.c
+index 5b6de6c4..4c7a28df 100644
+--- a/blasfeo_hp_cm/dgemm.c
++++ b/blasfeo_hp_cm/dgemm.c
+@@ -106,43 +106,43 @@ void blasfeo_hp_dgemm_nt_m2(int m, int n, int k, double alpha, double *pA, int
+ 	double *pA_p, *pB_p;
+ 
+ #if defined(TARGET_X64_INTEL_HASWELL)
+-	_mm_prefetch(pA+0, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+0, _MM_HINT_T0);
+-	_mm_prefetch(pA+8*sda+0, _MM_HINT_T0);
+-	_mm_prefetch(pB+0, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8*sda+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+0), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+8, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+8, _MM_HINT_T0);
+-	_mm_prefetch(pA+8*sda+8, _MM_HINT_T0);
+-	_mm_prefetch(pB+8, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8*sda+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+16, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+16, _MM_HINT_T0);
+-	_mm_prefetch(pA+8*sda+16, _MM_HINT_T0);
+-	_mm_prefetch(pB+16, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8*sda+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+16), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+24, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+24, _MM_HINT_T0);
+-	_mm_prefetch(pA+8*sda+24, _MM_HINT_T0);
+-	_mm_prefetch(pB+24, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8*sda+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+24), _MM_HINT_T0);
+ #endif
+ 
+ #if defined(TARGET_X64_INTEL_SANDY_BRIDGE)
+-	_mm_prefetch(pA+0, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+0, _MM_HINT_T0);
+-	_mm_prefetch(pB+0, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+0), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+8, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+8, _MM_HINT_T0);
+-	_mm_prefetch(pB+8, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+16, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+16, _MM_HINT_T0);
+-	_mm_prefetch(pB+16, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+16), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pA+24, _MM_HINT_T0);
+-	_mm_prefetch(pA+4*sda+24, _MM_HINT_T0);
+-	_mm_prefetch(pB+24, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+4*sda+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+24), _MM_HINT_T0);
+ #endif
+ 
+ #if defined(TARGET_ARMV8A_ARM_CORTEX_A57)
+@@ -410,22 +410,22 @@ void blasfeo_hp_dgemm_nt_n2(int m, int n, int k, double alpha, double *pA, int
+ 	double *pA_p, *pB_p;
+ 
+ #if defined(TARGET_X64_INTEL_HASWELL)
+-	_mm_prefetch(pB+0, _MM_HINT_T0);
+-	_mm_prefetch(pB+4*sdb+0, _MM_HINT_T0);
+-	_mm_prefetch(pB+8*sdb+0, _MM_HINT_T0);
+-	_mm_prefetch(pA+0, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+4*sdb+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8*sdb+0), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+0), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pB+8, _MM_HINT_T0);
+-	_mm_prefetch(pB+4*sdb+8, _MM_HINT_T0);
+-	_mm_prefetch(pB+8*sdb+8, _MM_HINT_T0);
+-	_mm_prefetch(pA+8, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+4*sdb+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8*sdb+8), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+8), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pB+16, _MM_HINT_T0);
+-	_mm_prefetch(pB+4*sdb+16, _MM_HINT_T0);
+-	_mm_prefetch(pB+8*sdb+16, _MM_HINT_T0);
+-	_mm_prefetch(pA+16, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+4*sdb+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8*sdb+16), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+16), _MM_HINT_T0);
+ 
+-	_mm_prefetch(pB+24, _MM_HINT_T0);
+-	_mm_prefetch(pB+4*sdb+24, _MM_HINT_T0);
+-	_mm_prefetch(pB+8*sdb+24, _MM_HINT_T0);
+-	_mm_prefetch(pA+24, _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+4*sdb+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pB+8*sdb+24), _MM_HINT_T0);
++	_mm_prefetch((const char *)(pA+24), _MM_HINT_T0);
+ #endif
+ 
+ 	jj = 0;
