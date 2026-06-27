@@ -1,0 +1,116 @@
+schema_version: 1
+
+context:
+  name: libblasfeo
+  version: "0.1.4.2"
+  build: 1
+
+  build_offset_by_microarch:
+    "1": 100
+    "3": 300
+    "4": 400
+
+  # See https://github.com/giaf/blasfeo?tab=readme-ov-file#supported-computer-architectures
+  # and https://clang.llvm.org/docs/UsersManual.html#x86
+  #
+  # X64_INTEL_CORE is the TARGET setting more similar to nocona,
+  # so we use that for microarch_level == 1.
+  #
+  # microarch_level == 3 has AVX and AVX2, so it is basically
+  # TARGET X64_INTEL_HASWELL.
+  #
+  # microarch_level == 4 has AVX512F, so it is basically
+  # TARGET X64_INTEL_SKYLAKE_X.
+  blasfeo_target_by_microarch:
+    "1": X64_INTEL_CORE
+    "3": X64_INTEL_HASWELL
+    "4": X64_INTEL_SKYLAKE_X
+
+package:
+  name: ${{ name }}
+  version: ${{ version }}
+
+source:
+  url: https://github.com/giaf/blasfeo/archive/refs/tags/${{ version }}.tar.gz
+  sha256: df990206225095fb97ca1b1a3ebfe34cbc2cea7a8b2643ed3a6deb28a1848aa2
+
+build:
+  number: >-
+    ${{ build + (
+        build_offset_by_microarch[microarch_level]
+        if x86_64 else 0
+    ) }}
+
+  # Selects build.sh on Unix and build.bat on Windows.
+  script:
+    file: build
+    env:
+      # Modern arm processors (e.g. X Elite) have cache sizes more similar
+      # to the M1 from Apple, thus we set TARGET to ARMV8A_APPLE_M1.
+      #
+      # On Linux the main targets are mostly embedded systems like
+      # Raspberry Pis, hence we target the CORTEX A76.
+      BLASFEO_TARGET: >-
+        ${{
+          blasfeo_target_by_microarch[microarch_level] if x86_64
+          else "ARMV8A_APPLE_M1" if arm64
+          else "ARMV8A_ARM_CORTEX_A76" if aarch64
+          else "GENERIC"
+        }}
+
+requirements:
+  build:
+    # Note that x86_64-microarch-level doesn't support win,
+    # but we can still specify microarch_level for win builds.
+    # This package only sets the -march flags, but since the build process
+    # is custom anyway, we don't care on win.
+    - if: unix and x86_64
+      then: x86_64-microarch-level ${{ microarch_level }}
+
+    - ${{ compiler("c") }}
+    - ${{ stdlib("c") }}
+    - cmake
+    - pkg-config
+    - ninja
+
+    - if: win
+      then: clang
+
+  run:
+    - if: x86_64
+      then: _x86_64-microarch-level >=${{ microarch_level }}
+
+  run_exports:
+    - ${{ pin_subpackage(name, upper_bound="x.x.x") }}
+
+tests:
+  - package_contents:
+      include:
+        - blasfeo.h
+      lib:
+        - blasfeo
+
+  - script:
+      - cmake-package-check blasfeo --targets blasfeo
+    requirements:
+      run:
+        - cmake-package-check
+        - ${{ compiler("c") }}
+        - cmake
+
+  - script:
+      - if: linux
+        then: nm -s $PREFIX/lib/libblasfeo.so | grep "U "
+
+about:
+  homepage: https://github.com/giaf/blasfeo
+  repository: https://github.com/giaf/blasfeo
+  license: BSD-2-Clause
+  license_file: LICENSE.txt
+  summary: Basic linear algebra subroutines for embedded optimization
+
+extra:
+  feedstock-name: blasfeo
+  recipe-maintainers:
+    - RSchwan
+    - traversaro
