@@ -5,27 +5,6 @@ context:
   version: "0.1.4.2"
   build: 1
 
-  build_offset_by_microarch:
-    "1": 100
-    "3": 300
-    "4": 400
-
-  # See https://github.com/giaf/blasfeo?tab=readme-ov-file#supported-computer-architectures
-  # and https://clang.llvm.org/docs/UsersManual.html#x86
-  #
-  # X64_INTEL_CORE is the TARGET setting more similar to nocona,
-  # so we use that for microarch_level == 1.
-  #
-  # microarch_level == 3 has AVX and AVX2, so it is basically
-  # TARGET X64_INTEL_HASWELL.
-  #
-  # microarch_level == 4 has AVX512F, so it is basically
-  # TARGET X64_INTEL_SKYLAKE_X.
-  blasfeo_target_by_microarch:
-    "1": X64_INTEL_CORE
-    "3": X64_INTEL_HASWELL
-    "4": X64_INTEL_SKYLAKE_X
-
 package:
   name: ${{ name }}
   version: ${{ version }}
@@ -37,7 +16,10 @@ source:
 build:
   number: >-
     ${{ build + (
-        build_offset_by_microarch[microarch_level]
+        100 if (microarch_level | default(1)) in [1, "1"]
+        else 300 if (microarch_level | default(1)) in [3, "3"]
+        else 400 if (microarch_level | default(1)) in [4, "4"]
+        else 0
         if x86_64 else 0
     ) }}
 
@@ -45,14 +27,23 @@ build:
   script:
     file: build
     env:
-      # Modern arm processors (e.g. X Elite) have cache sizes more similar
-      # to the M1 from Apple, thus we set TARGET to ARMV8A_APPLE_M1.
+      # See https://github.com/giaf/blasfeo?tab=readme-ov-file#supported-computer-architectures
+      # and https://clang.llvm.org/docs/UsersManual.html#x86.
       #
-      # On Linux the main targets are mostly embedded systems like
-      # Raspberry Pis, hence we target the CORTEX A76.
+      # X64_INTEL_CORE is the TARGET setting more similar to nocona,
+      # so we use that for microarch_level == 1.
+      # microarch_level == 3 has AVX and AVX2, so it maps to X64_INTEL_HASWELL.
+      # microarch_level == 4 has AVX512F, so it maps to X64_INTEL_SKYLAKE_X.
+      #
+      # Modern arm processors (e.g. X Elite) have cache sizes more similar
+      # to Apple's M1, so arm64 uses ARMV8A_APPLE_M1.
+      # On Linux aarch64, typical targets are embedded systems like
+      # Raspberry Pi, so we use ARMV8A_ARM_CORTEX_A76.
       BLASFEO_TARGET: >-
         ${{
-          blasfeo_target_by_microarch[microarch_level] if x86_64
+          "X64_INTEL_CORE" if x86_64 and (microarch_level | default(1)) in [1, "1"]
+          else "X64_INTEL_HASWELL" if x86_64 and (microarch_level | default(1)) in [3, "3"]
+          else "X64_INTEL_SKYLAKE_X" if x86_64 and (microarch_level | default(1)) in [4, "4"]
           else "ARMV8A_APPLE_M1" if arm64
           else "ARMV8A_ARM_CORTEX_A76" if aarch64
           else "GENERIC"
@@ -65,7 +56,7 @@ requirements:
     # This package only sets the -march flags, but since the build process
     # is custom anyway, we don't care on win.
     - if: unix and x86_64
-      then: x86_64-microarch-level ${{ microarch_level }}
+      then: x86_64-microarch-level ==${{ microarch_level | default("1") }}
 
     - ${{ compiler("c") }}
     - ${{ stdlib("c") }}
@@ -78,7 +69,7 @@ requirements:
 
   run:
     - if: x86_64
-      then: _x86_64-microarch-level >=${{ microarch_level }}
+      then: _x86_64-microarch-level >=${{ microarch_level | default("1") }}
 
   run_exports:
     - ${{ pin_subpackage(name, upper_bound="x.x.x") }}

@@ -8,6 +8,7 @@ cd build
 # script_env section, depending on the microarch
 # level being built
 cmake ${CMAKE_ARGS} -GNinja .. \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
       -DCMAKE_BUILD_TYPE=Release \
       -DBUILD_TESTING:BOOL=ON \
       -DBLASFEO_TESTING:BOOL=OFF \
